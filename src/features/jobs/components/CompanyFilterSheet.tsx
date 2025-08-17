@@ -18,11 +18,18 @@ const CompanyFilterSheet: React.FC<CompanyFilterProps> = ({
   initialSelection = "Anytime",
 }) => {
   const [selected, setSelected] = useState(initialSelection);
+  const[option, setOptions] = useState<string>("");
 
   const handleApply = () => {
     onApply(selected);
     onClose();
   };
+
+  const handleSubmit = (e:React.FormEvent) => {
+    e.preventDefault();
+    options.push(option);
+    setSelected(option);
+  }
 
   return (
     <AnimatePresence>
@@ -53,12 +60,20 @@ const CompanyFilterSheet: React.FC<CompanyFilterProps> = ({
 
             {/* Title */}
             <h2 className="text-center text-xl font-semibold pb-6 pt-2 mb-8 border-b-1 border-foreground">
-              Experience level
+              Company
             </h2>
+            {/* Add company list input */}
+            <form className="flex justify-center py-2" onSubmit={handleSubmit}>
+                <input type="text" name="company" placeholder="Add a company"
+                    className="py-4 border-1 border-foreground rounded-lg px-6 w-full mx-2 placeholder-foreground"
+                    value={option}
+                    onChange={(e) => setOptions(e.target.value)}
+                />
+            </form>
 
             {/* Options */}
             <div className="flex flex-col justify-center items-center w-full">
-              <div className="grid grid-cols-2 gap-6 justify-between  mb-6 px-12 ">
+              <div className="flex flex-wrap gap-6 justify-between  mb-6 px-12 ">
                 {options.map((opt) => (
                   <>
                     <button

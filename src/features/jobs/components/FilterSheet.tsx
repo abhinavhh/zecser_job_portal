@@ -7,6 +7,7 @@ import axios from "axios";
 
 import DateFilterSheet from "./DateFilterSheet";
 import ExperienceFilterSheet from "./ExperienceFilterSheet";
+import CompanyFilterSheet from "./CompanyFilterSheet";
 
 interface FilterSheetProps {
   isOpen: boolean;
@@ -32,7 +33,7 @@ interface FilterState {
   sortBy: string;
 }
 
-type Panel = "main" | "datePosted" | "experienceLevel";
+type Panel = "main" | "datePosted" | "experienceLevel" | "company" ;
 
 const variants = {
   enter: { y: "100%" },
@@ -324,16 +325,22 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
               )}
 
               {activePanel === "experienceLevel" && (
-                // <motion.div
-                //   key="experienceLevel"
-                //   initial="enter" animate="center" exit="exit"
-                //   variants={variants}
-                // >
+                
                   <ExperienceFilterSheet isOpen={true} onClose={() => setActivePanel("main")} onApply={(selectedExperience) => {
                     setFilterState((prev) => ({ ...prev, experienceLevel: selectedExperience}));
                     setActivePanel("main");
                   }}/>
-                // </motion.div>
+              )}
+
+              {activePanel === "company" && (
+                <CompanyFilterSheet
+                  isOpen={true}
+                  onClose={() => setActivePanel("main")}
+                  onApply={(selectedCompany) => {
+                    setFilterState((prev) => ({ ...prev, company: selectedCompany}));
+                    setActivePanel("main");
+                  }}
+                />
               )}
             </AnimatePresence>
           </motion.div>
