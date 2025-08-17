@@ -3,6 +3,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import { Home } from "../pages";
 import { SearchPage } from "../pages";
 import JobResults from "../pages/JobResults";
+import DateFilterSheet from "../features/jobs/components/DateFilterSheet";
 
 const AppRoutes = () => {
   return (
@@ -10,6 +11,11 @@ const AppRoutes = () => {
       <Route path="/" element={<Home />} />
       <Route path="/search" element={<SearchPage />}/>
       <Route path="/jobs" element={<JobResults />} />
+      <Route path="/filter/date" element={<DateFilterSheet isOpen={true} onClose={function (): void {
+        throw new Error("Function not implemented.");
+      } } onApply={function (selected: string): void {
+        throw new Error("Function not implemented.");
+      } } />} />
       <Route element={<ProtectedRoute />}>
         {/* All protected routes should be here */}
         

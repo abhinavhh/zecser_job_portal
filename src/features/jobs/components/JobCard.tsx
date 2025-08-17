@@ -44,9 +44,9 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onDismiss }) => {
   };
 
   return (
-    <div className="w-full px-6 pt-3 flex cursor-pointer hover:bg-gray-50 transition-colors">
+    <div className="w-full pt-3 flex cursor-pointer hover:bg-gray-50 transition-colors">
       {/* Company Logo */}
-      <div className="flex-shrink-0" onClick={handleCardClick}>
+      <div className="flex-shrink-0 pl-6" onClick={handleCardClick}>
         <img
           src=""
           alt={`${job.company} logo`}
@@ -58,7 +58,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onDismiss }) => {
       </div>
 
       {/* Job Info */}
-      <div className="flex items-start flex-1 border-b border-border pl-3 pr-2 pb-3 ml-2">
+      <div className="flex items-start flex-1 border-b border-muted-foreground pl-3 pb-3 ml-2">
         <div className="flex-1" onClick={handleCardClick}>
           {/* Title & Company */}
           <h2 className="font-semibold text-foreground">{job.title}</h2>
