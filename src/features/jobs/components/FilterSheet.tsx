@@ -8,6 +8,8 @@ import axios from "axios";
 import DateFilterSheet from "./DateFilterSheet";
 import ExperienceFilterSheet from "./ExperienceFilterSheet";
 import CompanyFilterSheet from "./CompanyFilterSheet";
+import JobTypeFilterSheet from "./JobTypeFilterSheet";
+import RemoteFilterSheet from "./RemoteFilterSheet";
 
 interface FilterSheetProps {
   isOpen: boolean;
@@ -33,7 +35,7 @@ interface FilterState {
   sortBy: string;
 }
 
-type Panel = "main" | "datePosted" | "experienceLevel" | "company" ;
+type Panel = "main" | "datePosted" | "experienceLevel" | "company" | "jobType" | "remote";
 
 const variants = {
   enter: { y: "100%" },
@@ -326,10 +328,10 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
 
               {activePanel === "experienceLevel" && (
                 
-                  <ExperienceFilterSheet isOpen={true} onClose={() => setActivePanel("main")} onApply={(selectedExperience) => {
-                    setFilterState((prev) => ({ ...prev, experienceLevel: selectedExperience}));
-                    setActivePanel("main");
-                  }}/>
+                <ExperienceFilterSheet isOpen={true} onClose={() => setActivePanel("main")} onApply={(selectedExperience) => {
+                  setFilterState((prev) => ({ ...prev, experienceLevel: selectedExperience}));
+                  setActivePanel("main");
+                }}/>
               )}
 
               {activePanel === "company" && (
@@ -342,6 +344,29 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
                   }}
                 />
               )}
+
+              {activePanel === "jobType" && (
+                <JobTypeFilterSheet
+                  isOpen={true}
+                  onClose={() => setActivePanel("main")}
+                  onApply={(selectedJobType) => {
+                    setFilterState((prev) => ({ ...prev, jobType: selectedJobType}));
+                    setActivePanel("main");
+                  }}
+                />
+              )}
+
+              {activePanel === "remote" && (
+                <RemoteFilterSheet
+                  isOpen={true}
+                  onClose={() => setActivePanel("main")}
+                  onApply={(selectedRemote) => {
+                    setFilterState((prev) => ({ ...prev, remote: selectedRemote}));
+                    setActivePanel("main");
+                  }}
+                />
+              )}
+
             </AnimatePresence>
           </motion.div>
         </>

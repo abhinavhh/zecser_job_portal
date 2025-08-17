@@ -63,14 +63,14 @@ const ExperienceFilterSheet: React.FC<ExperienceFilterProps> = ({
                   <>
                     <button
                       key={opt}
-                      className={`py-1.5 px-2 rounded-full border-1 border-muted-foreground flex justify-around ${
+                      className={`py-1.5 px-2 rounded-full border-1 border-muted-foreground flex justify-around items-center gap-1 ${
                         selected === opt
                           ? "bg-primary text-secondary"
                           : "bg-primary-foreground text-foreground"
                       }`}
                       onClick={() => setSelected(opt)}
                     >
-                      {opt} <PlusIcon size={25}/>
+                      {opt} <PlusIcon size={20}/>
                     </button>
                     
                   </>

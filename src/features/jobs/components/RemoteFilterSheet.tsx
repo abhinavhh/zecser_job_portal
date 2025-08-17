@@ -2,34 +2,27 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PlusIcon } from "lucide-react";
 import React, { useState } from "react";
 
-const options = ["Nirman Academy", "KBros Aristo Pvt Ltd"];
+const options = ["On-site", "Remote", "Hy-brid"];
 
-interface CompanyFilterProps {
+interface RemoteFilterProps {
   isOpen: boolean;
   onClose: () => void;
   onApply: (selected: string) => void;
   initialSelection?: string;
 }
 
-const CompanyFilterSheet: React.FC<CompanyFilterProps> = ({
+const RemoteFilterSheet: React.FC<RemoteFilterProps> = ({
   isOpen,
   onClose,
   onApply,
   initialSelection = "Anytime",
 }) => {
   const [selected, setSelected] = useState(initialSelection);
-  const[option, setOptions] = useState<string>("");
 
   const handleApply = () => {
     onApply(selected);
     onClose();
   };
-
-  const handleSubmit = (e:React.FormEvent) => {
-    e.preventDefault();
-    options.push(option);
-    setSelected(option);
-  }
 
   return (
     <AnimatePresence>
@@ -60,20 +53,12 @@ const CompanyFilterSheet: React.FC<CompanyFilterProps> = ({
 
             {/* Title */}
             <h2 className="text-center text-xl font-semibold pb-6 pt-2 mb-8 border-b-1 border-foreground">
-              Company
+              Remote
             </h2>
-            {/* Add company list input */}
-            <form className="flex justify-center py-2" onSubmit={handleSubmit}>
-                <input type="text" name="company" placeholder="Add a company"
-                    className="py-4 border-1 border-foreground rounded-lg px-6 w-full mx-2 placeholder-foreground"
-                    value={option}
-                    onChange={(e) => setOptions(e.target.value)}
-                />
-            </form>
 
             {/* Options */}
-            <div className="flex flex-col justify-center items-center w-full">
-              <div className="flex flex-wrap gap-6 justify-between  mb-6 px-12 ">
+            <div className="flex flex-col items-center w-full">
+              <div className="flex gap-12 mb-6 ">
                 {options.map((opt) => (
                   <>
                     <button
@@ -107,4 +92,4 @@ const CompanyFilterSheet: React.FC<CompanyFilterProps> = ({
   );
 };
 
-export default CompanyFilterSheet;
+export default RemoteFilterSheet;
