@@ -6,6 +6,7 @@ import { ChevronRight } from "lucide-react";
 import axios from "axios";
 
 import DateFilterSheet from "./DateFilterSheet";
+import ExperienceFilterSheet from "./ExperienceFilterSheet";
 
 interface FilterSheetProps {
   isOpen: boolean;
@@ -323,24 +324,16 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
               )}
 
               {activePanel === "experienceLevel" && (
-                <motion.div
-                  key="experienceLevel"
-                  initial="enter" animate="center" exit="exit"
-                  variants={variants}
-                >
-                  <div className="py-4 px-6">
-                    <h3 className="text-sm font-semibold mb-2">Experience level</h3>
-                    {["Any","Entry","Mid","Senior"].map(opt => (
-                      <button
-                        key={opt}
-                        className={`block w-full text-left py-2 ${filterState.experienceLevel === opt ? 'font-semibold text-blue-600' : 'text-foreground'}`}
-                        onClick={() => setFilterState(prev => ({ ...prev, experienceLevel: opt }))}
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
+                // <motion.div
+                //   key="experienceLevel"
+                //   initial="enter" animate="center" exit="exit"
+                //   variants={variants}
+                // >
+                  <ExperienceFilterSheet isOpen={true} onClose={() => setActivePanel("main")} onApply={(selectedExperience) => {
+                    setFilterState((prev) => ({ ...prev, experienceLevel: selectedExperience}));
+                    setActivePanel("main");
+                  }}/>
+                // </motion.div>
               )}
             </AnimatePresence>
           </motion.div>

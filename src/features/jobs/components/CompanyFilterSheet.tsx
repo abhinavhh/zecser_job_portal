@@ -2,16 +2,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PlusIcon } from "lucide-react";
 import React, { useState } from "react";
 
-const options = ["Internship", "Entry level", "Associate", "Mid-Senior level", "Director", "Executive"];
+const options = ["Nirman Academy", "KBros Aristo Pvt Ltd"];
 
-interface ExperienceFilterProps {
+interface CompanyFilterProps {
   isOpen: boolean;
   onClose: () => void;
   onApply: (selected: string) => void;
   initialSelection?: string;
 }
 
-const ExperienceFilterSheet: React.FC<ExperienceFilterProps> = ({
+const CompanyFilterSheet: React.FC<CompanyFilterProps> = ({
   isOpen,
   onClose,
   onApply,
@@ -92,4 +92,4 @@ const ExperienceFilterSheet: React.FC<ExperienceFilterProps> = ({
   );
 };
 
-export default ExperienceFilterSheet;
+export default CompanyFilterSheet;
