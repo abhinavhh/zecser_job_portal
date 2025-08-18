@@ -47,8 +47,8 @@ const DUMMY_JOBS: Job[] = [
     title: "Backend Engineer",
     company: "Innovate Solutions",
     location: "Thiruvananthapuram, Kerala",
-    activelyReviewing: false,
-    viewed: true,
+    activelyReviewing: true,
+    viewed: false,
     earlyApplicant: false,
     easyApply: false,
     postedTime: "5 days ago",
@@ -59,10 +59,10 @@ const DUMMY_JOBS: Job[] = [
     company: "Creative Minds",
     location: "Kozhikode, Kerala",
     activelyReviewing: true,
-    viewed: false,
+    viewed: true,
     earlyApplicant: true,
     easyApply: true,
-    postedTime: "1 day ago",
+    postedTime: "",
   },
 ];
 
