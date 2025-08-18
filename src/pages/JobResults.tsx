@@ -71,6 +71,7 @@ const JobResults = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [recentSearches, setRecentSearches ] = useState<string[]>([]);
   const [activeFilters, setActiveFilters] = useState<FilterState>({
     jobs: true,
     easy: true,
@@ -109,6 +110,8 @@ const JobResults = () => {
     fetchJobs();
   }, []);
 
+
+
   const handleSearchBarClick = () => {
     navigate("/search", {
       state: {
@@ -117,6 +120,10 @@ const JobResults = () => {
       },
     });
   };
+
+  const handleSelectedRecent = (term: string) => {
+    setSearchQuery(term);
+  }
 
   const handleFiltersChange = (newFilters: FilterState) => {
     setActiveFilters(newFilters);
@@ -145,7 +152,7 @@ const JobResults = () => {
         <div className="flex flex-col gap-4 justify-center items-center w-full">
           <div onClick={handleSearchBarClick} className="w-full">
             <SearchBar
-              placeholder=""
+              placeholder="Search ..."
               icon="search"
               value={searchQuery}
               onChange={() => {}}

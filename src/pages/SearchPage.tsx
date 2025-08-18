@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, MapPin, Clock, X } from "lucide-react";
+import { ArrowLeft, Clock, X } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import SearchBar from "../features/jobs/components/SearchBar";
 import LocationSelector from "../features/jobs/components/LocationSelector";
@@ -21,7 +21,10 @@ const SearchPage = () => {
   const location = useLocation();
   const state = location.state as LocationState;
 
-  const [searchQuery, setSearchQuery] = useState(state?.currentQuery || "");
+  const [searchQuery, setSearchQuery] = useState({
+    companyName: "",
+    location: "",
+  });
   const [selectedLocation, setSelectedLocation] = useState("Kerala, India");
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [showLocationSelector, setShowLocationSelector] = useState(false);
@@ -34,123 +37,146 @@ const SearchPage = () => {
 
   const fetchSearchHistory = async () => {
     try {
-      const response = await axios.get('/api/search/history');
+      const response = await axios.get("/api/search/history");
       if (response.data.success) {
         setSearchHistory(response.data.history || []);
       }
     } catch (error: any) {
-      console.error('Error fetching search history:', error);
-      alert(`Error loading search history: ${error.response?.data?.message || error.message}`);
+      console.error("Error fetching search history:", error);
+      alert(
+        `Error loading search history: ${error.response?.data?.message || error.message}`
+      );
     }
   };
 
-  const handleSearch = async (query: string = searchQuery) => {
-    if (!query.trim()) return;
+  const handleSearch = async (query?: string) => {
+    const finalQuery = query || searchQuery.companyName;
+    if (!finalQuery.trim()) return;
 
     try {
       setLoading(true);
-
       // Save search to history
-      await axios.post('/api/search/history', {
-        query: query.trim(),
-        location: selectedLocation
+      await axios.post("/api/search/history", {
+        query: finalQuery.trim(),
+        location: selectedLocation,
       });
+      // Refresh history after saving
+      await fetchSearchHistory();
 
       // Navigate back to job results with search query
-      navigate(state?.returnTo || '/jobs', {
+      navigate(state?.returnTo || "/jobs", {
         state: {
-          searchQuery: query.trim(),
-          location: selectedLocation
-        }
+          searchQuery: finalQuery.trim(),
+          location: selectedLocation,
+        },
       });
     } catch (error: any) {
-      console.error('Error performing search:', error);
-      alert(`Search error: ${error.response?.data?.message || error.message}`);
+      console.error("Error performing search:", error);
+      alert(
+        `Search error: ${error.response?.data?.message || error.message}`
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  // Ensure clicking an item re-triggers search
   const handleHistoryItemClick = (historyItem: SearchHistory) => {
-    setSearchQuery(historyItem.query);
+    setSearchQuery((prev) => ({
+      ...prev,
+      companyName: historyItem.query,
+    }));
     handleSearch(historyItem.query);
   };
 
-  const handleDeleteHistoryItem = async (historyId: number, e: React.MouseEvent) => {
+  const handleDeleteHistoryItem = async (
+    historyId: number,
+    e: React.MouseEvent
+  ) => {
     e.stopPropagation();
-    
+
     try {
       await axios.delete(`/api/search/history/${historyId}`);
-      setSearchHistory(prev => prev.filter(item => item.id !== historyId));
+      setSearchHistory((prev) => prev.filter((item) => item.id !== historyId));
     } catch (error: any) {
-      console.error('Error deleting search history:', error);
-      alert(`Error deleting history: ${error.response?.data?.message || error.message}`);
+      console.error("Error deleting search history:", error);
+      alert(
+        `Error deleting history: ${error.response?.data?.message || error.message}`
+      );
     }
   };
 
   const clearAllHistory = async () => {
     try {
-      await axios.delete('/api/search/history');
+      await axios.delete("/api/search/history");
       setSearchHistory([]);
     } catch (error: any) {
-      console.error('Error clearing search history:', error);
-      alert(`Error clearing history: ${error.response?.data?.message || error.message}`);
+      console.error("Error clearing search history:", error);
+      alert(
+        `Error clearing history: ${error.response?.data?.message || error.message}`
+      );
     }
   };
 
   return (
     <div className="w-full min-h-screen bg-secondary">
       {/* Header */}
-      <div className="flex items-center px-4 pt-4 gap-3 bg-background shadow-sm">
-        <button className="flex-shrink-0">
-          <ArrowLeft 
-            size={25} 
-            className="text-muted-foreground" 
-            onClick={() => navigate(state?.returnTo || '/jobs')} 
-          />
-        </button>
-        <div className="flex flex-col gap-4 w-full justify-center items-center pb-4">
+      <div className="px-4 pt-4 bg-secondary shadow-sm border-b-1 border-foreground">
+        {/* Arrow + First SearchBar */}
+        <div className="flex items-center gap-3 w-full pb-4">
+          <button
+            className="flex-shrink-0"
+            onClick={() => navigate(state?.returnTo || "/jobs")}
+          >
+            <ArrowLeft size={25} className="text-muted-foreground" />
+          </button>
+
+          {/* First SearchBar */}
+          <div className="flex-1">
+            <SearchBar
+              placeholder="Search by title, skill, or company"
+              icon="search"
+              value={searchQuery.companyName}
+              onChange={(val) =>
+                setSearchQuery((prev) => ({ ...prev, companyName: val }))
+              }
+              onClear={() =>
+                setSearchQuery((prev) => ({ ...prev, companyName: "" }))
+              }
+              showLocationIcon={false}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch();
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Second SearchBar (Location) */}
+        <div className="ml-9 pb-4">
           <SearchBar
-            placeholder="Search jobs..."
-            icon="search"
-            value={searchQuery}
-            onChange={setSearchQuery}
-            onClear={() => setSearchQuery("")}
-            showLocationIcon={true}
+            placeholder="City, State, or Zip code"
+            icon="location"
+            value={searchQuery.location}
+            onChange={(val) =>
+              setSearchQuery((prev) => ({ ...prev, location: val }))
+            }
+            onClear={() =>
+              setSearchQuery((prev) => ({ ...prev, location: "" }))
+            }
+            showLocationIcon={false}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSearch();
+            }}
           />
         </div>
-      </div>
-
-      {/* Location Selector */}
-      <div className="px-4 py-2 bg-background border-b">
-        <button 
-          onClick={() => setShowLocationSelector(true)}
-          className="flex items-center gap-2 text-sm text-muted-foreground"
-        >
-          <MapPin size={16} />
-          <span>{selectedLocation}</span>
-        </button>
-      </div>
-
-      {/* Search Button */}
-      <div className="px-4 py-4 bg-background border-b">
-        <button
-          onClick={() => handleSearch()}
-          disabled={!searchQuery.trim() || loading}
-          className={`w-full py-3 rounded-lg text-white font-medium ${
-            !searchQuery.trim() || loading
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-        >
-          {loading ? 'Searching...' : 'Search Jobs'}
-        </button>
       </div>
 
       {/* Search History */}
       <div className="px-4 py-4">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-foreground">Recent searches</h3>
+          <h3 className="text-lg font-light text-foreground">
+            Try searching for
+          </h3>
           {searchHistory.length > 0 && (
             <button
               onClick={clearAllHistory}
