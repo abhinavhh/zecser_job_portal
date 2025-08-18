@@ -14,9 +14,9 @@ const DateFilterSheet: React.FC<DateFilterSheetProps> = ({
   isOpen,
   onClose,
   onApply,
-  initialSelection = "Anytime",
+  initialSelection,
 }) => {
-  const [selected, setSelected] = useState(initialSelection);
+  const [selected, setSelected] = useState(initialSelection || "Anytime");
 
   const handleApply = () => {
     onApply(selected);
@@ -33,7 +33,7 @@ const DateFilterSheet: React.FC<DateFilterSheetProps> = ({
             className="fixed inset-0 z-40 bg-secondary/15"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 0 }}                                                                      
             onClick={onClose}
           />
 

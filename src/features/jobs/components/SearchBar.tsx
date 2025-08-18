@@ -21,7 +21,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onClear,
   readonly = false,
   onKeyDown,
-  showLocationIcon = false
 }) => {
   const IconComponent = icon === "search" ? Search : MapPin;
 

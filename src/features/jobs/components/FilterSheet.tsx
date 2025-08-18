@@ -1,9 +1,9 @@
-import { motion, AnimatePresence, applyGeneratorOptions } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Switch } from "../../../components/ui/switch";
-import { ChevronRight } from "lucide-react";
 import axios from "axios";
+import { useSearchParams } from "react-router-dom";
 
 import DateFilterSheet from "./DateFilterSheet";
 import ExperienceFilterSheet from "./ExperienceFilterSheet";
@@ -21,7 +21,7 @@ interface FilterSheetProps {
 interface FilterState {
   datePosted: string;
   experienceLevel: string;
-  company: string;
+  company: string | string[];
   jobType: string;
   remote: string;
   easyApply: boolean;
@@ -35,7 +35,13 @@ interface FilterState {
   sortBy: string;
 }
 
-type Panel = "main" | "datePosted" | "experienceLevel" | "company" | "jobType" | "remote";
+type Panel =
+  | "main"
+  | "datePosted"
+  | "experienceLevel"
+  | "company"
+  | "jobType"
+  | "remote";
 
 const variants = {
   enter: { y: "100%" },
@@ -49,29 +55,46 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
   activeFilters,
   onFiltersChange,
 }) => {
-  const [filterState, setFilterState] = useState<FilterState>({ 
+  const [searchParams, setSearchParams] = useSearchParams();
 
-    datePosted: "Edit",
-    experienceLevel: "Any",
-    company: "Any",
-    jobType: "Any",
-    remote: "Any",
-    easyApply: false,
-    hasVerifications: false,
-    location: "Any",
-    industry: "Any",
-    jobFunction: "Any",
-    title: "Any",
-    under10Applicants: false,
-    inYourNetwork: false,
-    sortBy: "Most relevant"
+  const [filterState, setFilterState] = useState<FilterState>({
+    datePosted: searchParams.get("datePosted") || "Anytime",
+    experienceLevel: searchParams.get("experienceLevel") || "Any",
+    company: searchParams.get("company") || "Any",
+    jobType: searchParams.get("jobType") || "Any",
+    remote: searchParams.get("remote") || "Any",
+    easyApply: searchParams.get("easyApply") === "true",
+    hasVerifications: searchParams.get("hasVerifications") === "true",
+    location: searchParams.get("location") || "Any",
+    industry: searchParams.get("industry") || "Any",
+    jobFunction: searchParams.get("jobFunction") || "Any",
+    title: searchParams.get("title") || "Any",
+    under10Applicants: searchParams.get("under10Applicants") === "true",
+    inYourNetwork: searchParams.get("inYourNetwork") === "true",
+    sortBy: searchParams.get("sortBy") || "Most relevant",
   });
+
   const [activePanel, setActivePanel] = useState<Panel>("main");
   const [loading, setLoading] = useState(false);
 
+  // Keep URL in sync when filterState changes
+  useEffect(() => {
+    const params = new URLSearchParams();
+    Object.entries(filterState).forEach(([key, val]) => {
+      if (typeof val === "boolean") {
+        if (val) params.set(key, "true");
+      } else if (val !== "Any" && val !== "Anytime" && val !== "Most relevant") {
+        params.set(key, val);
+      }
+    });
+    setSearchParams(params, { replace: true });
+  }, [filterState, setSearchParams]);
+
   // Escape key closes the sheet
   useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose]);
@@ -81,110 +104,45 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
     if (isOpen) {
       (async () => {
         try {
-          const resp = await axios.get('/api/user/filter-preferences');
+          const resp = await axios.get("/api/user/filter-preferences");
           if (resp.data.success && resp.data.filters) {
-            setFilterState(prev => ({ ...prev, ...resp.data.filters }));
+            setFilterState((prev) => ({ ...prev, ...resp.data.filters }));
           }
         } catch (err) {
-          console.error('Error loading filters', err);
+          console.error("Error loading filters", err);
         }
       })();
     }
   }, [isOpen]);
 
   const filterItems = [
-    { 
-      label: "Date posted", 
-      value: filterState.datePosted, 
-      type: "link",
-      key: "datePosted"
-    },
-    { 
-      label: "Experience level", 
-      value: filterState.experienceLevel, 
-      type: "link",
-      key: "experienceLevel"
-    },
-    { 
-      label: "Company", 
-      value: filterState.company, 
-      type: "link",
-      key: "company"
-    },
-    { 
-      label: "Job type", 
-      value: filterState.jobType, 
-      type: "link",
-      key: "jobType"
-    },
-    { 
-      label: "Remote", 
-      value: filterState.remote, 
-      type: "link",
-      key: "remote"
-    },
-    { 
-      label: "Easy Apply", 
-      value: filterState.easyApply, 
-      type: "switch",
-      key: "easyApply"
-    },
-    { 
-      label: "Has verifications", 
-      value: filterState.hasVerifications, 
-      type: "switch",
-      key: "hasVerifications"
-    },
-    { 
-      label: "Location", 
-      value: filterState.location, 
-      type: "link",
-      key: "location"
-    },
-    { 
-      label: "Industry", 
-      value: filterState.industry, 
-      type: "link",
-      key: "industry"
-    },
-    { 
-      label: "Job function", 
-      value: filterState.jobFunction, 
-      type: "link",
-      key: "jobFunction"
-    },
-    { 
-      label: "Title", 
-      value: filterState.title, 
-      type: "link",
-      key: "title"
-    },
-    { 
-      label: "Under 10 applicants", 
-      value: filterState.under10Applicants, 
-      type: "switch",
-      key: "under10Applicants"
-    },
-    { 
-      label: "In your network", 
-      value: filterState.inYourNetwork, 
-      type: "switch",
-      key: "inYourNetwork"
-    },
+    { label: "Date posted", value: filterState.datePosted, type: "link", key: "datePosted" },
+    { label: "Experience level", value: filterState.experienceLevel, type: "link", key: "experienceLevel" },
+    { label: "Company", value: filterState.company === "Any"? "Any" : filterState.company, type: "link", key: "company" },
+    { label: "Job type", value: filterState.jobType, type: "link", key: "jobType" },
+    { label: "Remote", value: filterState.remote, type: "link", key: "remote" },
+    { label: "Easy Apply", value: filterState.easyApply, type: "switch", key: "easyApply" },
+    { label: "Has verifications", value: filterState.hasVerifications, type: "switch", key: "hasVerifications" },
+    { label: "Location", value: filterState.location, type: "link", key: "location" },
+    { label: "Industry", value: filterState.industry, type: "link", key: "industry" },
+    { label: "Job function", value: filterState.jobFunction, type: "link", key: "jobFunction" },
+    { label: "Title", value: filterState.title, type: "link", key: "title" },
+    { label: "Under 10 applicants", value: filterState.under10Applicants, type: "switch", key: "under10Applicants" },
+    { label: "In your network", value: filterState.inYourNetwork, type: "switch", key: "inYourNetwork" },
   ];
 
   const handleSwitchChange = (key: keyof FilterState, value: boolean) => {
-    setFilterState(prev => ({ ...prev, [key]: value }));
+    setFilterState((prev) => ({ ...prev, [key]: value }));
   };
 
   const saveFilters = async () => {
     setLoading(true);
     try {
-      await axios.post('/api/user/filter-preferences', { filters: filterState });
+      await axios.post("/api/user/filter-preferences", { filters: filterState });
       onFiltersChange({
         jobs: true,
         easy: filterState.easyApply,
-        date: filterState.datePosted !== "Any time",
+        date: filterState.datePosted !== "Anytime",
         exp: filterState.experienceLevel !== "Any",
       });
       onClose();
@@ -198,7 +156,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
 
   const resetFilters = () => {
     setFilterState({
-      datePosted: "Any time",
+      datePosted: "Anytime",
       experienceLevel: "Any",
       company: "Any",
       jobType: "Any",
@@ -231,15 +189,20 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
           {/* Container */}
           <motion.div
             className="fixed bottom-0 left-0 right-0 z-50 rounded-t-4xl shadow-lg shadow-black max-h-[90vh] flex flex-col overflow-y-auto bg-secondary"
-            initial="enter" animate="center" exit="exit"
-            variants={variants} transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            variants={variants}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             {/* Handle & Header */}
             <div className="flex justify-center p-2">
               <div className="w-18 h-1 bg-foreground rounded-full" />
             </div>
             <div className="flex justify-between items-center px-6 pb-2 border-b-1 border-muted-foreground">
-              <h2 className="text-lg font-semibold">{activePanel === "main" ? "Filters" : ""}</h2>
+              <h2 className="text-lg font-semibold">
+                {activePanel === "main" ? "Filters" : ""}
+              </h2>
               {activePanel !== "main" && (
                 <button onClick={() => setActivePanel("main")}>Back</button>
               )}
@@ -250,12 +213,16 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
               {activePanel === "main" && (
                 <motion.div
                   key="main"
-                  initial="enter" animate="center" exit="exit"
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
                   variants={variants}
                 >
-                  {/* Premium & Sort sections*/}
-                  <div className="my-4 mx-12 bg-border border-secondary rounded-xl px-6 py-4 flex flex-col space-y-2 items-center justify-center border-1 border- md:w-md md:self-center">
-                    <h2 className="text-center">Filter jobs where you'd be a top applicant</h2>
+                  {/* Premium & Sort sections */}
+                  <div className="my-4 mx-12 bg-border border-secondary rounded-xl px-6 py-4 flex flex-col space-y-2 items-center justify-center border-1 md:w-md md:self-center">
+                    <h2 className="text-center">
+                      Filter jobs where you'd be a top applicant
+                    </h2>
                     <div className="flex items-center justify-center gap-2">
                       <div className="w-[12px] h-[12px] bg-red-500 rounded-xs"></div>
                       <p className="text-blue-400 text-sm">Try premium for $10</p>
@@ -270,8 +237,8 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
 
                   {/* Sort By Section */}
                   <div className="border-t-2 border-muted-foreground pt-4 pb-1 pr-6 text-foreground font-normal text-[16px]">
-                    <div className=" flex justify-between border-b-1 ml-6 pr-4 w-full">
-                      <label className="">Sort by</label>
+                    <div className="flex justify-between border-b-1 ml-6 pr-4 w-full">
+                      <label>Sort by</label>
                       <p className="text-xs">{filterState.sortBy}</p>
                     </div>
                   </div>
@@ -285,14 +252,11 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
                       >
                         <span>{item.label}</span>
                         {item.type === "link" ? (
-                          <div className="flex items-center gap-2">
-                            <span
-                              className="pb-4 cursor-pointer"
-                              onClick={() => setActivePanel(item.key as Panel)}
-                            >
-                              {filterState[item.key as keyof FilterState]?.toString()}
-                            </span>
-                            {/* <ChevronRight className="w-4 h-4 text-muted-foreground" /> */}
+                          <div
+                            className="flex items-center gap-2 cursor-pointer"
+                            onClick={() => setActivePanel(item.key as Panel)}
+                          >
+                            <span>{filterState[item.key as keyof FilterState]?.toString()}</span>
                           </div>
                         ) : (
                           <Switch
@@ -304,34 +268,55 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
                         )}
                       </div>
                     ))}
-                    {/* Buttons for Reset / Apply */}
-                    {/* <div className="flex justify-end gap-2 p-4">
-                      <button onClick={resetFilters} className="text-sm text-primary">Reset</button>
+
+                    {/* Reset / Apply buttons */}
+                    <div className="flex justify-end gap-2 p-4">
+                      <button
+                        onClick={resetFilters}
+                        className="text-sm text-primary"
+                      >
+                        Reset
+                      </button>
                       <button
                         onClick={saveFilters}
                         disabled={loading}
-                        className={`text-sm text-secondary rounded ${loading ? 'bg-gray-600' : 'bg-primary hover:bg-blue-600/'} px-4 py-1`}
+                        className={`text-sm text-secondary rounded ${
+                          loading ? "bg-gray-600" : "bg-primary hover:bg-blue-600/"
+                        } px-4 py-1`}
                       >
-                        {loading ? 'Saving...' : 'Apply'}
+                        {loading ? "Saving..." : "Apply"}
                       </button>
-                    </div> */}
+                    </div>
                   </div>
                 </motion.div>
               )}
 
               {activePanel === "datePosted" && (
-                <DateFilterSheet isOpen={true} onClose={() => setActivePanel("main")} onApply={(selectedDate) => {
-                  setFilterState((prev) => ({ ...prev, datePosted: selectedDate}));
-                  setActivePanel("main");
-                }}/>
+                <DateFilterSheet
+                  isOpen={true}
+                  onClose={() => setActivePanel("main")}
+                  onApply={(selectedDate) => {
+                    setFilterState((prev) => ({
+                      ...prev,
+                      datePosted: selectedDate,
+                    }));
+                    setActivePanel("main");
+                  }}
+                />
               )}
 
               {activePanel === "experienceLevel" && (
-                
-                <ExperienceFilterSheet isOpen={true} onClose={() => setActivePanel("main")} onApply={(selectedExperience) => {
-                  setFilterState((prev) => ({ ...prev, experienceLevel: selectedExperience}));
-                  setActivePanel("main");
-                }}/>
+                <ExperienceFilterSheet
+                  isOpen={true}
+                  onClose={() => setActivePanel("main")}
+                  onApply={(selectedExperience) => {
+                    setFilterState((prev) => ({
+                      ...prev,
+                      experienceLevel: selectedExperience,
+                    }));
+                    setActivePanel("main");
+                  }}
+                />
               )}
 
               {activePanel === "company" && (
@@ -339,7 +324,10 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
                   isOpen={true}
                   onClose={() => setActivePanel("main")}
                   onApply={(selectedCompany) => {
-                    setFilterState((prev) => ({ ...prev, company: selectedCompany}));
+                    setFilterState((prev) => ({
+                      ...prev,
+                      company: selectedCompany,
+                    }));
                     setActivePanel("main");
                   }}
                 />
@@ -350,7 +338,10 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
                   isOpen={true}
                   onClose={() => setActivePanel("main")}
                   onApply={(selectedJobType) => {
-                    setFilterState((prev) => ({ ...prev, jobType: selectedJobType}));
+                    setFilterState((prev) => ({
+                      ...prev,
+                      jobType: selectedJobType,
+                    }));
                     setActivePanel("main");
                   }}
                 />
@@ -361,12 +352,14 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
                   isOpen={true}
                   onClose={() => setActivePanel("main")}
                   onApply={(selectedRemote) => {
-                    setFilterState((prev) => ({ ...prev, remote: selectedRemote}));
+                    setFilterState((prev) => ({
+                      ...prev,
+                      remote: selectedRemote,
+                    }));
                     setActivePanel("main");
                   }}
                 />
               )}
-
             </AnimatePresence>
           </motion.div>
         </>

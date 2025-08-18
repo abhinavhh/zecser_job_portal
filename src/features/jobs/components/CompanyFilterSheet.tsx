@@ -1,41 +1,53 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { PlusIcon } from "lucide-react";
+import { Check } from "lucide-react";
 import React, { useState } from "react";
 
-const options = ["Nirman Academy", "KBros Aristo Pvt Ltd"];
+const defaultOptions = ["Nirman Academy", "KBros Aristo Pvt Ltd"];
 
 interface CompanyFilterProps {
   isOpen: boolean;
   onClose: () => void;
-  onApply: (selected: string) => void;
-  initialSelection?: string;
+  onApply: (selected: string[]) => void;
+  initialSelection?: string[];
 }
 
 const CompanyFilterSheet: React.FC<CompanyFilterProps> = ({
   isOpen,
   onClose,
   onApply,
-  initialSelection = "Anytime",
+  initialSelection = [],
 }) => {
-  const [selected, setSelected] = useState(initialSelection);
-  const[option, setOptions] = useState<string>("");
+  const [options, setOptions] = useState(defaultOptions);
+  const [selected, setSelected] = useState<string[]>(initialSelection || "Any");
+  const [input, setInput] = useState("");
+
+  // toggle selection
+  const toggleSelection = (opt: string) => {
+    setSelected((prev) =>
+      prev.includes(opt) ? prev.filter((item) => item !== opt) : [...prev, opt]
+    );
+  };
 
   const handleApply = () => {
     onApply(selected);
     onClose();
   };
 
-  const handleSubmit = (e:React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    options.push(option);
-    setSelected(option);
-  }
+    if (input.trim() && !options.includes(input)) {
+      setOptions((prev) => [...prev, input]);
+    }
+    if (input.trim()) {
+      toggleSelection(input);
+    }
+    setInput("");
+  };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          
           {/* Background Overlay */}
           <motion.div
             className="fixed inset-0 z-40 bg-secondary/15"
@@ -62,33 +74,36 @@ const CompanyFilterSheet: React.FC<CompanyFilterProps> = ({
             <h2 className="text-center text-xl font-semibold pb-6 pt-2 mb-8 border-b-1 border-foreground">
               Company
             </h2>
-            {/* Add company list input */}
+
+            {/* Add company input */}
             <form className="flex justify-center py-2" onSubmit={handleSubmit}>
-                <input type="text" name="company" placeholder="Add a company"
-                    className="py-4 border-1 border-foreground rounded-lg px-6 w-full mx-2 placeholder-foreground"
-                    value={option}
-                    onChange={(e) => setOptions(e.target.value)}
-                />
+              <input
+                type="text"
+                name="company"
+                placeholder="Add a company"
+                className="py-4 border-1 border-foreground rounded-lg px-6 w-full mx-2 placeholder-foreground"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+              />
             </form>
 
             {/* Options */}
             <div className="flex flex-col justify-center items-center w-full">
-              <div className="flex flex-wrap gap-6 justify-between  mb-6 px-12 ">
+              <div className="flex flex-wrap gap-4 justify-start mb-6 px-6">
                 {options.map((opt) => (
-                  <>
-                    <button
-                      key={opt}
-                      className={`py-1.5 px-2 rounded-full border-1 border-muted-foreground flex justify-around items-center gap-1 ${
-                        selected === opt
-                          ? "bg-primary text-secondary"
-                          : "bg-primary-foreground text-foreground"
-                      }`}
-                      onClick={() => setSelected(opt)}
-                    >
-                      {opt} <PlusIcon size={20}/>
-                    </button>
-                    
-                  </>
+                  <button
+                    key={opt}
+                    type="button"
+                    className={`py-1.5 px-3 rounded-full border flex items-center gap-2 ${
+                      selected.includes(opt)
+                        ? "bg-primary text-secondary border-primary"
+                        : "bg-primary-foreground text-foreground border-muted-foreground"
+                    }`}
+                    onClick={() => toggleSelection(opt)}
+                  >
+                    {opt}
+                    {selected.includes(opt) && <Check size={16} />}
+                  </button>
                 ))}
               </div>
 
