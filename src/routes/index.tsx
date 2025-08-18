@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import { Home } from "../pages";
 import { SearchPage } from "../pages";
-import JobResults from "../pages/JobResults";
+import JobResults from "../pages/JobPage";
 import DateFilterSheet from "../features/jobs/components/DateFilterSheet";
 
 const AppRoutes = () => {
