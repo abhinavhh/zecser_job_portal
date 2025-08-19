@@ -85,3 +85,4 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onDismiss }) => {
     </div>
   );
 };
+export default JobCard;

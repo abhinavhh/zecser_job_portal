@@ -2,22 +2,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PlusIcon } from "lucide-react";
 import React, { useState } from "react";
 
-const options = ["On-site", "Remote", "Hy-brid"];
+const options = ["On-site", "Remote", "Hy-brid"] as const;
+type RemoteOption = typeof options[number];
 
 interface RemoteFilterProps {
   isOpen: boolean;
   onClose: () => void;
-  onApply: (selected: string) => void;
-  initialSelection?: string;
+  onApply: (selected: RemoteOption) => void;
+  initialSelection?: RemoteOption;
 }
 
 const RemoteFilterSheet: React.FC<RemoteFilterProps> = ({
   isOpen,
   onClose,
   onApply,
-  initialSelection = "Anytime",
+  initialSelection = "On-site", // ✅ changed from "Anytime"
 }) => {
-  const [selected, setSelected] = useState(initialSelection);
+  const [selected, setSelected] = useState<RemoteOption>(initialSelection);
 
   const handleApply = () => {
     onApply(selected);
@@ -28,7 +29,6 @@ const RemoteFilterSheet: React.FC<RemoteFilterProps> = ({
     <AnimatePresence>
       {isOpen && (
         <>
-          
           {/* Background Overlay */}
           <motion.div
             className="fixed inset-0 z-40 bg-secondary/15"
@@ -58,22 +58,20 @@ const RemoteFilterSheet: React.FC<RemoteFilterProps> = ({
 
             {/* Options */}
             <div className="flex flex-col items-center w-full">
-              <div className="flex gap-12 mb-6 ">
+              <div className="flex gap-12 mb-6">
                 {options.map((opt) => (
-                  <>
-                    <button
-                      key={opt}
-                      className={`py-1.5 px-2 rounded-full border-1 border-muted-foreground flex justify-around items-center gap-1 ${
-                        selected === opt
-                          ? "bg-primary text-secondary"
-                          : "bg-primary-foreground text-foreground"
-                      }`}
-                      onClick={() => setSelected(opt)}
-                    >
-                      {opt} <PlusIcon size={20}/>
-                    </button>
-                    
-                  </>
+                  <button
+                    key={opt}
+                    className={`py-1.5 px-2 rounded-full border-1 border-muted-foreground flex justify-around items-center gap-1 ${
+                      selected === opt
+                        ? "bg-primary text-secondary"
+                        : "bg-primary-foreground text-foreground"
+                    }`}
+                    onClick={() => setSelected(opt)}
+                    aria-pressed={selected === opt} // ✅ accessibility
+                  >
+                    {opt} <PlusIcon size={20} />
+                  </button>
                 ))}
               </div>
 

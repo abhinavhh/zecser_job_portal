@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, Clock, X } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import SearchBar from "../features/jobs/components/SearchBar";
-import LocationSelector from "../features/jobs/components/LocationSelector";
+
 import axios from "axios";
 
 interface SearchHistory {
@@ -27,7 +27,7 @@ const SearchPage = () => {
   });
   const [selectedLocation, setSelectedLocation] = useState("Kerala, India");
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
-  const [showLocationSelector, setShowLocationSelector] = useState(false);
+  // const [showLocationSelector, setShowLocationSelector] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Fetch search history on mount
@@ -222,13 +222,13 @@ const SearchPage = () => {
       </div>
 
       {/* Location Selector Modal */}
-      {showLocationSelector && (
+      {/* {showLocationSelector && (
         <LocationSelector
           currentLocation={selectedLocation}
           onLocationSelect={setSelectedLocation}
           onClose={() => setShowLocationSelector(false)}
         />
-      )}
+      )} */}
     </div>
   );
 };

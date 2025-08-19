@@ -1,25 +1,107 @@
 // src/pages/JobResults.tsx
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { SearchBar } from "../features/jobs";
-import { FilterBar } from "../features/jobs/components/FilterBar";
-import { JobList } from "../features/jobs/components/JobList";
-import TopJobsPicks from "../features/jobs/components/TopJobsPicks";
-import FilterSheet from "../features/jobs/components/FilterSheet";
+
+// Import everything from jobs barrel file
+import {
+  SearchBar,
+  FilterBar,
+  JobList,
+  TopJobsPicks,
+  FilterSheet,
+  type FilterToggles,
+  type FilterState,
+  useJobs,
+} from "../features/jobs";
+
+
 import { useNavigate } from "react-router-dom";
-import type { FilterState } from "../features/jobs/types";
 
 const JobPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilters, setActiveFilters] = useState<FilterState>({
+  const [activeFilters, setActiveFilters] = useState<FilterToggles>({
     jobs: true,
-    easy: true,
-    date: false,
-    exp: false,
+    easyApply: false,
+    datePosted: false,
+    experienceLevel: false,
   });
+
+  const [filterSheetStates, setFilterSheetStates] = useState<FilterState>({
+    datePosted: "Anytime",
+    experienceLevel: "Any", 
+    company: "Any",
+    jobType: "Any",
+    remote: "Any",
+    easyApply: false,
+    hasVerifications: false,
+    location: "Any",
+    industry: "Any",
+    jobFunction: "Any",
+    title: "Any",
+    under10Applicants: false,
+    inYourNetwork: false,
+    sortBy: "Most relevant",// Ensure industry is always a string
+  });
+
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
   const navigate = useNavigate();
+
+  // Use the jobs hook - this handles all filtering logic
+  useJobs(searchQuery);
+
+  /**
+   * Handle filter bar changes
+   * Updates the quick filter toggles and may set default filter values
+   */
+  const handleFilterBarChange = (filters: FilterToggles) => {
+    setActiveFilters(filters);
+    
+    // Sync with filter sheet state if needed
+    if (filters.easyApply !== filterSheetStates.easyApply) {
+      setFilterSheetStates(prev => ({
+        ...prev,
+        easyApply: filters.easyApply
+      }));
+    }
+  };
+
+   /**
+   * Handle filter sheet changes
+   * Updates the detailed filter state and syncs with filter bar
+   */
+  const handleFilterSheetChange = (filters: any) => {
+    // Update filter bar toggles based on filter sheet state
+    setActiveFilters(prev => ({
+      ...prev,
+      jobs: filters.job || false,
+      easyApply: filters.easy || false,
+      datePosted: filters.date || false,
+      experienceLevel: filters.exp || false,
+    }));
+  };
+
+  /**
+   * Open the detailed filter sheet
+   */
+  const openFilterSheet = () => {
+    setIsFilterSheetOpen(true);
+  };
+
+
+  /**
+   * Close the detailed filter sheet
+   */
+  const closeFilterSheet = () => {
+    setIsFilterSheetOpen(false);
+  };
+
+  /**
+   * Handle search input changes
+   */
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
 
   return (
     <div className="w-full min-h-screen bg-secondary pb-6">
@@ -37,7 +119,7 @@ const JobPage = () => {
               placeholder="Search ..."
               icon="search"
               value={searchQuery}
-              onChange={() => {}}
+              onChange={() => handleSearchChange}
               readonly={true}
             />
           </div>
@@ -46,18 +128,19 @@ const JobPage = () => {
 
       <FilterBar
         activeFilters={activeFilters}
-        onFiltersChange={setActiveFilters}
+        onFiltersChange={handleFilterBarChange}
         onOpenFilterSheet={() => setIsFilterSheetOpen(true)}
       />
 
+
       <FilterSheet
         isOpen={isFilterSheetOpen}
-        onClose={() => setIsFilterSheetOpen(false)}
-        activeFilters={activeFilters}
-        onFiltersChange={(filters) => setActiveFilters(filters as FilterState)}
+        onClose={closeFilterSheet}
+        activeFilters={filterSheetStates}
+        onFiltersChange={handleFilterSheetChange}
       />
 
-      <JobList searchQuery={searchQuery} activeFilters={activeFilters} />
+      <JobList searchQuery={searchQuery} activeFilters={filterSheetStates} />
 
       <TopJobsPicks />
     </div>

@@ -2,19 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { JobCard } from "./JobCard";
 import { useState, useEffect } from "react";
 import axios from "axios";
-
-interface Job {
-  id: number;
-  title: string;
-  company: string;
-  location: string;
-  activelyReviewing: boolean;
-  viewed: boolean;
-  earlyApplicant: boolean;
-  easyApply: boolean;
-  promoted?: boolean;
-  postedTime: string;
-}
+import type { Job } from "../types";
 
 interface TopJobsPicksProps {
   onJobDismiss?: (jobId: number) => void;

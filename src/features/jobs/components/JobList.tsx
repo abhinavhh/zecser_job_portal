@@ -8,8 +8,8 @@ interface JobListProps {
   activeFilters: FilterState;
 }
 
-export const JobList = ({ searchQuery, activeFilters }: JobListProps) => {
-  const { jobsData, loading, error, dismissJob } = useJobs(searchQuery, activeFilters);
+export const JobList = ({ searchQuery }: JobListProps) => {
+  const { jobsData, loading, error, dismissJob } = useJobs(searchQuery);
 
   return (
     <div className="bg-mute">
@@ -31,3 +31,5 @@ export const JobList = ({ searchQuery, activeFilters }: JobListProps) => {
     </div>
   );
 };
+
+export default JobList;
