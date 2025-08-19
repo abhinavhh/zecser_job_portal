@@ -84,9 +84,9 @@ const JobPage = () => {
   /**
    * Open the detailed filter sheet
    */
-  const openFilterSheet = () => {
-    setIsFilterSheetOpen(true);
-  };
+  // const openFilterSheet = () => {
+  //   setIsFilterSheetOpen(true);
+  // };
 
 
   /**

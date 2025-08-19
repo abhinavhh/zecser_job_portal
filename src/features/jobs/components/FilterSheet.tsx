@@ -15,7 +15,7 @@ interface FilterSheetProps {
   isOpen: boolean;
   onClose: () => void;
   activeFilters: FilterState;
-  onFiltersChange: (filters: FilterState) => void;
+  onFiltersChange: (filters: { jobs: boolean; easyApply: boolean; datePosted: boolean; experienceLevel: boolean }) => void;
 }
 
 interface FilterState {
@@ -52,7 +52,7 @@ const variants = {
 const FilterSheet: React.FC<FilterSheetProps> = ({
   isOpen,
   onClose,
-  activeFilters,
+  // activeFilters,
   onFiltersChange,
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -167,12 +167,12 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
       // Save to API for persistence
       await axios.post("/api/user/filter-preferences", { filters: filterState });
       
-      // Update parent component with summary of active filters
+      // Update parent component with summary of active filters for FilterBar
       onFiltersChange({
-        job: true, // Jobs filter is always active when using filter sheet
-        easy: filterState.easyApply,
-        date: filterState.datePosted !== "Anytime",
-        exp: filterState.experienceLevel !== "Any",
+        jobs: true, // Jobs filter is always active when using filter sheet
+        easyApply: filterState.easyApply,
+        datePosted: filterState.datePosted !== "Anytime",
+        experienceLevel: filterState.experienceLevel !== "Any",
       });
       
       onClose();

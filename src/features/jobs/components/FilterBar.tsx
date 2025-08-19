@@ -111,7 +111,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
         `}
       </style>
 
-      <div className="flex items-center gap-5 pl-4 py-2 min-w-full whitespace-nowrap">
+      <div className="flex items-center justify-center gap-5 pl-4 py-2 min-w-full whitespace-nowrap">
         {filters.map((f, idx) => (
           <React.Fragment key={f.key}>
             <div className="flex space-x-4 items-center">
