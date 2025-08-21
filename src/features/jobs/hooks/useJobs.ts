@@ -5,8 +5,19 @@ import axios from "axios";
 import { mockJobs } from "../data/mockJobs";
 import type { Job } from "../types";
 
+
+// Helper to calculate "days ago" from postedTime
+const calculateDaysAgo = (postedTime: string) => {
+  const now = Date.now();
+  const posted = new Date(postedTime).getTime();
+  const diffMs = now - posted;
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24)); // in days
+};
+
+type JobWithDerived = Job & {postedDaysAgo: number};
+
 export const useJobs = (searchQuery: string) => {
-  const [jobsData, setJobsData] = useState<Job[]>([]);
+  const [jobsData, setJobsData] = useState<JobWithDerived[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -107,7 +118,10 @@ export const useJobs = (searchQuery: string) => {
       }
     });
 
-    return filtered;
+    return filtered.map((job) => ({
+      ...job,
+      postedDaysAgo: calculateDaysAgo(job.postedTime),
+    }));
   };
 
   /**

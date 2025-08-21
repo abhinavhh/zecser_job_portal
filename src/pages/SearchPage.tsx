@@ -16,7 +16,12 @@ interface LocationState {
   returnTo?: string;
 }
 
-const SearchPage = () => {
+interface SearchPageProps {
+  onClose: () => void;
+  onSearch: (query: string) => void;
+}
+
+const SearchPage = ({onClose, onSearch}: SearchPageProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as LocationState;
@@ -63,13 +68,9 @@ const SearchPage = () => {
       // Refresh history after saving
       await fetchSearchHistory();
 
-      // Navigate back to job results with search query
-      navigate(state?.returnTo || "/jobs", {
-        state: {
-          searchQuery: finalQuery.trim(),
-          location: selectedLocation,
-        },
-      });
+      // Call Parent
+      onSearch(finalQuery.trim());
+
     } catch (error: any) {
       console.error("Error performing search:", error);
       alert(
@@ -126,7 +127,7 @@ const SearchPage = () => {
         <div className="flex items-center gap-3 w-full pb-4">
           <button
             className="flex-shrink-0"
-            onClick={() => navigate(state?.returnTo || "/jobs")}
+            onClick={onClose}
           >
             <ArrowLeft size={25} className="text-muted-foreground" />
           </button>

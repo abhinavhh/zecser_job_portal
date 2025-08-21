@@ -4,6 +4,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 interface Job {
+  postedDaysAgo: number;
   id: number;
   title: string;
   company: string;
@@ -65,7 +66,11 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onDismiss }) => {
               <span className="text-foreground font-semibold">Viewed</span>
             )}
             {job.postedTime && !job.viewed && (
-              <span className="text-foreground">{job.postedTime}</span>
+              <span className="text-foreground">{job.postedDaysAgo === 0
+      ? "Today"
+      : job.postedDaysAgo === 1
+      ? "1 day ago"
+      : `${job.postedDaysAgo} days ago`}</span>
             )}
             {job.earlyApplicant && (
               <span className="text-green-700">Be an early applicant</span>

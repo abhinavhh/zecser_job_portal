@@ -20,7 +20,7 @@ const dummyJobs: Job[] = [
     earlyApplicant: true,
     easyApply: true,
     promoted: true,
-    postedTime: "2h ago",
+    postedTime: "",
   },
   {
     id: 2,
@@ -31,7 +31,7 @@ const dummyJobs: Job[] = [
     viewed: true,
     earlyApplicant: false,
     easyApply: true,
-    postedTime: "1 day ago",
+    postedTime: "",
   },
   {
     id: 3,
@@ -39,10 +39,10 @@ const dummyJobs: Job[] = [
     company: "PixelCraft",
     location: "Kozhikode, Kerala",
     activelyReviewing: true,
-    viewed: false,
+    viewed: true,
     earlyApplicant: true,
     easyApply: false,
-    postedTime: "3 days ago",
+    postedTime: "",
   },
 ];
 
@@ -122,7 +122,7 @@ const TopJobsPicks: React.FC<TopJobsPicksProps> = ({ onJobDismiss }) => {
       ) : (
         <div className="mt-4">
           {jobsData.map((job) => (
-            <JobCard key={job.id} job={job} onDismiss={handleJobDismiss} />
+            <JobCard key={job.id} job={job} onDismiss={handleJobDismiss}/>
           ))}
         </div>
       )}

@@ -1,8 +1,6 @@
 // src/pages/JobResults.tsx
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
-
-// Import everything from jobs barrel file
 import {
   SearchBar,
   FilterBar,
@@ -14,11 +12,14 @@ import {
   useJobs,
 } from "../features/jobs";
 
-
 import { useNavigate } from "react-router-dom";
+import SearchPage from "./SearchPage"; // ✅ import as a component
 
 const JobPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false); // 🔹 new state
+
   const [activeFilters, setActiveFilters] = useState<FilterToggles>({
     jobs: true,
     easyApply: false,
@@ -40,38 +41,20 @@ const JobPage = () => {
     title: "Any",
     under10Applicants: false,
     inYourNetwork: false,
-    sortBy: "Most relevant",// Ensure industry is always a string
+    sortBy: "Most relevant",
   });
 
-  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-
   const navigate = useNavigate();
-
-  // Use the jobs hook - this handles all filtering logic
   useJobs(searchQuery);
 
-  /**
-   * Handle filter bar changes
-   * Updates the quick filter toggles and may set default filter values
-   */
   const handleFilterBarChange = (filters: FilterToggles) => {
     setActiveFilters(filters);
-    
-    // Sync with filter sheet state if needed
     if (filters.easyApply !== filterSheetStates.easyApply) {
-      setFilterSheetStates(prev => ({
-        ...prev,
-        easyApply: filters.easyApply
-      }));
+      setFilterSheetStates(prev => ({ ...prev, easyApply: filters.easyApply }));
     }
   };
 
-   /**
-   * Handle filter sheet changes
-   * Updates the detailed filter state and syncs with filter bar
-   */
   const handleFilterSheetChange = (filters: any) => {
-    // Update filter bar toggles based on filter sheet state
     setActiveFilters(prev => ({
       ...prev,
       jobs: filters.job || false,
@@ -81,68 +64,70 @@ const JobPage = () => {
     }));
   };
 
-  /**
-   * Open the detailed filter sheet
-   */
-  // const openFilterSheet = () => {
-  //   setIsFilterSheetOpen(true);
-  // };
+  const closeFilterSheet = () => setIsFilterSheetOpen(false);
 
-
-  /**
-   * Close the detailed filter sheet
-   */
-  const closeFilterSheet = () => {
-    setIsFilterSheetOpen(false);
-  };
-
-  /**
-   * Handle search input changes
-   */
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
   return (
-    <div className="w-full min-h-screen bg-secondary pb-6">
-      <div className="flex items-center px-4 pt-4 gap-3 justify-center w-full">
-        <button className="flex-shrink-0">
-          <ArrowLeft
-            size={25}
-            className="text-muted-foreground"
-            onClick={() => navigate("/home")}
+    <div className="w-full min-h-screen bg-secondary pb-6 relative">
+      {/* 🔹 Search Overlay */}
+      {isSearchOpen && (
+        <div className="absolute inset-0 z-50 bg-background">
+          <SearchPage
+            onClose={() => setIsSearchOpen(false)} // 🔹 pass close handler
+            onSearch={(q: string) => {
+              setSearchQuery(q);
+              setIsSearchOpen(false);
+            }}
           />
-        </button>
-        <div className="flex flex-col gap-4 justify-center items-center w-full">
-          <div onClick={() => navigate("/search", { state: { currentQuery: searchQuery, returnTo: "/jobs" } })} className="w-full">
-            <SearchBar
-              placeholder="Search ..."
-              icon="search"
-              value={searchQuery}
-              onChange={() => handleSearchChange}
-              readonly={true}
-            />
-          </div>
         </div>
-      </div>
+      )}
 
-      <FilterBar
-        activeFilters={activeFilters}
-        onFiltersChange={handleFilterBarChange}
-        onOpenFilterSheet={() => setIsFilterSheetOpen(true)}
-      />
+      {/* 🔹 Normal JobPage Content */}
+      {!isSearchOpen && (
+        <>
+          <div className="flex items-center px-4 pt-4 gap-3 justify-center w-full">
+            <button className="flex-shrink-0">
+              <ArrowLeft
+                size={25}
+                className="text-muted-foreground"
+                onClick={() => navigate("/home")}
+              />
+            </button>
+            <div className="flex flex-col gap-4 justify-center items-center w-full">
+              {/* Instead of navigating, open search overlay */}
+              <div onClick={() => setIsSearchOpen(true)} className="w-full">
+                <SearchBar
+                  placeholder="Search ..."
+                  icon="search"
+                  value={searchQuery}
+                  onChange={() => handleSearchChange}
+                  readonly={true}
+                />
+              </div>
+            </div>
+          </div>
 
+          <FilterBar
+            activeFilters={activeFilters}
+            onFiltersChange={handleFilterBarChange}
+            onOpenFilterSheet={() => setIsFilterSheetOpen(true)}
+          />
 
-      <FilterSheet
-        isOpen={isFilterSheetOpen}
-        onClose={closeFilterSheet}
-        activeFilters={filterSheetStates}
-        onFiltersChange={handleFilterSheetChange}
-      />
+          <FilterSheet
+            isOpen={isFilterSheetOpen}
+            onClose={closeFilterSheet}
+            activeFilters={filterSheetStates}
+            onFiltersChange={handleFilterSheetChange}
+          />
 
-      <JobList searchQuery={searchQuery} activeFilters={filterSheetStates} />
+          <JobList searchQuery={searchQuery} activeFilters={filterSheetStates} />
 
-      <TopJobsPicks />
+          <TopJobsPicks />
+        </>
+      )}
     </div>
   );
 };
