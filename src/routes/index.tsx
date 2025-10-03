@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import { Home } from "../pages";
-import { SearchPage } from "../pages";
+// import { SearchPage } from "../pages";
 import JobResults from "../pages/JobPage";
 import DateFilterSheet from "../features/jobs/components/DateFilterSheet";
 import NotificationPage from "../pages/NotificationPage";
