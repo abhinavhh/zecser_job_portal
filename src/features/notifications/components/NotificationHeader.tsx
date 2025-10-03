@@ -5,10 +5,13 @@ import {
   SelectItem,
   SelectTrigger,
 } from "../../../components/ui/select";
-import { useFilter } from "../hooks/useFilter";
+import type { FilterOptions } from "../hooks/useFilter";
 
-const NotificationHeader = () => {
-  const { selectedFilter, handleFilterChange } = useFilter();
+interface Props {
+  selectedFilter: FilterOptions;
+  handleFilterChange: (value: FilterOptions) => void;
+}
+const NotificationHeader = ({ selectedFilter, handleFilterChange }: Props) => {
   return (
     <div className="flex justify-around py-6 items-center">
       <ChevronLeft size={25} className="text-" />
@@ -24,8 +27,8 @@ const NotificationHeader = () => {
         <SelectContent>
           <SelectItem value="all">All</SelectItem>
           <SelectItem value="preference">Job Preference</SelectItem>
-          <SelectItem value="posts">My Posts</SelectItem>
-          <SelectItem value="mentions">Mentions</SelectItem>
+          <SelectItem value="post">My Posts</SelectItem>
+          <SelectItem value="mention">Mentions</SelectItem>
         </SelectContent>
       </Select>
     </div>
