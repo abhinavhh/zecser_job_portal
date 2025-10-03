@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 
 import { cn } from "../../lib/utils";
 
@@ -104,13 +104,18 @@ function SelectItem({
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
-      className={cn("text-center my-1 bg-accent mx-0 px-2.5 py-1 rounded-md hover:border-0 hover:outline-0 hover:bg-gray-200", className)}
+      className={cn(
+        "text-center my-1 bg-accent mx-0 px-2.5 py-1 rounded-md hover:border-0 hover:outline-0",
+        "hover:bg-gray-200",
+        "data-[state=checked]:bg-gray-300",
+        className
+      )}
       {...props}
     >
-      <span className="absolute right-2 flex size-3.5 items-center justify-center">
-        <SelectPrimitive.ItemIndicator>
+      <span className="absolute right-4 flex size-3.5 items-center justify-center">
+        {/* <SelectPrimitive.ItemIndicator>
           <CheckIcon className="size-4" />
-        </SelectPrimitive.ItemIndicator>
+        </SelectPrimitive.ItemIndicator> */}
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     </SelectPrimitive.Item>
