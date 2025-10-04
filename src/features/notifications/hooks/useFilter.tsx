@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { mockNotifications } from "../data/mock.data";
 
-export type FilterOptions = "all" | "preference" | "posts" | "mentions";
+export type FilterOptions = "all" | "preference" | "post" | "mention";
 export function useFilter(defaultValue: FilterOptions = "all") {
   const [selectedFilter, setSelectedFilter] =
     useState<FilterOptions>(defaultValue);

@@ -6,12 +6,28 @@ interface Props {
 }
 const NotificationBody = ({ selectedFilter, filterNotifications }: Props) => {
   return (
-    <div className="p-2 space-y-3">
-      {selectedFilter}
+    <div className="px-4 py-4 space-y-4">
+      <div
+        className={`${
+          selectedFilter === "all"
+            ? "flex items-center justify-end w-full text-muted-foreground"
+            : "text-muted-foreground ml-4"
+        }`}
+      >
+        {selectedFilter === "all"
+          ? "All"
+          : selectedFilter === "preference"
+          ? "Job Preference"
+          : selectedFilter === "post"
+          ? "My Posts"
+          : selectedFilter === "mention"
+          ? "Mentions"
+          : ""}
+      </div>
       {filterNotifications.map((n) => (
         <div
           key={n.id}
-          className="flex flex-col gap-2 p-3 rounded-lg shadow-sm"
+          className="flex flex-col gap-2 p-3 rounded-lg shadow-md"
         >
           {/* Top Row: Image + Text */}
           <div className="flex items-center gap-3 justify-center">
