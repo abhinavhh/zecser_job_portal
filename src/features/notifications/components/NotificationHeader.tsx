@@ -6,6 +6,7 @@ import {
   SelectTrigger,
 } from "../../../components/ui/select";
 import type { FilterOptions } from "../hooks/useFilter";
+import { Link } from "react-router-dom";
 
 interface Props {
   selectedFilter: FilterOptions;
@@ -14,7 +15,9 @@ interface Props {
 const NotificationHeader = ({ selectedFilter, handleFilterChange }: Props) => {
   return (
     <div className="flex justify-around py-6 items-center">
-      <ChevronLeft size={25} className="text-" />
+      <Link to="/">
+        <ChevronLeft size={25} className="hover:text-gray-600" />
+      </Link>
       <div className="flex justify-center gap-1">
         <Bell size={25} className="fill-black" />
         <h1 className="font-medium text-[16px]">Notification</h1>
