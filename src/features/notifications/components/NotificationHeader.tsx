@@ -2,7 +2,7 @@ import { Bell, ChevronLeft, Funnel } from "lucide-react";
 import {
   Select,
   SelectContent,
-  SelectItem
+  SelectItem,
   SelectTrigger,
 } from "../../../components/ui/select";
 import type { FilterOptions } from "../hooks/useFilter";
